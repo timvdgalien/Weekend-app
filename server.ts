@@ -1,6 +1,11 @@
 import express from 'express'
 import cors from 'cors'
 import Anthropic from '@anthropic-ai/sdk'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const app = express()
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3001
@@ -121,6 +126,13 @@ Suggest the single best activity for right now. Consider the time of day, weathe
     const message = err instanceof Error ? err.message : 'Claude API error'
     res.status(500).json({ error: message })
   }
+})
+
+// Serve built frontend
+const distPath = path.join(__dirname, 'dist')
+app.use(express.static(distPath))
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(distPath, 'index.html'))
 })
 
 app.listen(port, () => {
